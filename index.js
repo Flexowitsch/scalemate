@@ -1,76 +1,115 @@
 
+document.addEventListener('DOMContentLoaded', () => {
+    const subline = document.getElementById("subline");
+    const suggestButton = document.getElementById('suggestButton');
+    const calendarButton = document.getElementById('calendarButton');
+    const regenerateButton = document.getElementById('regenerateButton');
+    const majorScalesContainer = document.getElementById('majorScalesContainer');
+    const minorScalesContainer = document.getElementById('minorScalesContainer');
+    const messageContainer = document.createElement('p');
+    let regenerateClicks = 0;
+    let shownMajorScales = [];
+    let shownMinorScales = [];
 
-    // Initialize arrays for major and minor scales
-    let majorScales = ['C Major', 'G Major', 'D Major', 'A Major', 'E Major', 'B Major', 'F# Major', 'Db Major', 'Ab Major', 'Eb Major', 'Bb Major', 'F Major'];
-    let minorScales = ['A Minor', 'E Minor', 'B Minor', 'F# Minor', 'C# Minor', 'G# Minor', 'D# Minor', 'Bb Minor', 'F Minor', 'C Minor', 'G Minor', 'D Minor'];
+    document.querySelector('.content-wrapper').appendChild(messageContainer);
 
-    // Initialize arrays to keep track of selected scales
-    let selectedMajorScales = [];
-    let selectedMinorScales = [];
-
-    // Function to shuffle arrays
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+    function getRandomScales(scales, shownScales) {
+        let availableScales = scales.filter(scale => !shownScales.includes(scale));
+        if (availableScales.length < 2) {
+            shownScales.length = 0; // Reset if there are not enough scales left for selection
+            availableScales = [...scales];
         }
-        return array;
+        return availableScales.sort(() => 0.5 - Math.random()).slice(0, 2); // Return 2 random scales
     }
 
-    // Function to suggest scales
-    function suggestScales() {
-        // Shuffle arrays if all scales have been selected
-        if (selectedMajorScales.length === majorScales.length && selectedMinorScales.length === minorScales.length) {
-            selectedMajorScales = [];
-            selectedMinorScales = [];
-        }
+    suggestButton.addEventListener('click', () => {
+        suggestButton.style.display = 'none';
+        calendarButton.style.display = 'flex';
+        regenerateButton.style.display = 'flex';
 
-        // Shuffle arrays if all major scales have been selected
-        if (selectedMajorScales.length === majorScales.length) {
-            selectedMajorScales = [];
-        }
+        regenerateClicks = 0; // Reset the counter if suggest is clicked again after practicing.
+        messageContainer.textContent = ''; // Clear message
+        displayRandomScales();
+    });
 
-        // Shuffle arrays if all minor scales have been selected
-        if (selectedMinorScales.length === minorScales.length) {
-            selectedMinorScales = [];
+    regenerateButton.addEventListener('click', () => {
+        if (regenerateClicks < 3) {
+            displayRandomScales();
+            regenerateClicks += 1;
+        } else {
+            messageContainer.textContent = 'No more regeneration possible now. It is time to practice!';
         }
+    });
 
-        // Randomly select two major scales
-        let suggestedMajorScales = [];
-        while (suggestedMajorScales.length < 2) {
-            const randomIndex = Math.floor(Math.random() * majorScales.length);
-            const scale = majorScales[randomIndex];
-            if (!selectedMajorScales.includes(scale)) {
-                suggestedMajorScales.push(scale);
-                selectedMajorScales.push(scale);
-            }
-        }
+    function displayRandomScales() {
+        const majorScales = Array.from(majorScalesContainer.children);
+        const minorScales = Array.from(minorScalesContainer.children);
 
-        // Randomly select two minor scales
-        let suggestedMinorScales = [];
-        while (suggestedMinorScales.length < 2) {
-            const randomIndex = Math.floor(Math.random() * minorScales.length);
-            const scale = minorScales[randomIndex];
-            if (!selectedMinorScales.includes(scale)) {
-                suggestedMinorScales.push(scale);
-                selectedMinorScales.push(scale);
-            }
-        }
 
-        // Display the suggested scales
-        document.getElementById('selectedScales').innerHTML = `
-            <p>Suggested Major Scales:</p>
-            <ul>
-                <li>${suggestedMajorScales[0]}</li>
-                <li>${suggestedMajorScales[1]}</li>
-            </ul>
-            <p>Suggested Minor Scales:</p>
-            <ul>
-                <li>${suggestedMinorScales[0]}</li>
-                <li>${suggestedMinorScales[1]}</li>
-            </ul>
-        `;
+        majorScalesContainer.style.justifyContent = 'space-between';
+        minorScalesContainer.style.justifyContent = 'space-between';
+
+        majorScales.forEach(scale => scale.style.display = 'none');
+        minorScales.forEach(scale => scale.style.display = 'none');
+
+        const randomMajorScales = getRandomScales(majorScales, shownMajorScales);
+        const randomMinorScales = getRandomScales(minorScales, shownMinorScales);
+
+        randomMajorScales.forEach(scale => {
+            scale.style.display = 'flex';
+            shownMajorScales.push(scale);
+        });
+        randomMinorScales.forEach(scale => {
+            scale.style.display = 'flex';
+            shownMinorScales.push(scale);
+        });
+
+        document.querySelector('.suggestions-container').style.display = 'block'; // Show the suggestions container
     }
+});
 
-    // Add event listener to the button
-    document.getElementById('suggestButton').addEventListener('click', suggestScales);
+
+// Calendar Button functionality
+
+calendarButton.addEventListener('click', () => {
+    const shownMajorScaleNames = Array.from(document.querySelectorAll('#majorScalesContainer .flex[style="display: flex;"] span')).map(element => element.textContent);
+    const shownMinorScaleNames = Array.from(document.querySelectorAll('#minorScalesContainer .flex[style="display: flex;"] span')).map(element => element.textContent);
+    let allShownScales = shownMajorScaleNames.concat(shownMinorScaleNames);
+
+    // Limit the number of scales in the title to keep it reasonable
+    const scalesForTitle = allShownScales.slice(0, 5);
+    const moreScales = allShownScales.length > 5 ? ` +${allShownScales.length - 5} more` : '';
+    const eventTitle = `Practice Scales: ${scalesForTitle.join(', ')}${moreScales}`;
+
+    // Find next Monday
+    const nextMonday = new Date();
+    nextMonday.setDate(nextMonday.getDate() + ((1 + 7 - nextMonday.getDay()) % 7 || 7));
+
+    // Find following Sunday
+    const nextSunday = new Date(nextMonday);
+    nextSunday.setDate(nextSunday.getDate() + 6);
+
+    const dateFormat = { year: 'numeric', month: '2-digit', day: '2-digit' };
+
+    // Create an iCal event for the whole next week
+    const iCalContent = 
+`BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:${nextMonday.toLocaleDateString('en-CA', dateFormat).replace(/-/g, '')}
+DTEND;VALUE=DATE:${nextSunday.toLocaleDateString('en-CA', dateFormat).replace(/-/g, '')}
+SUMMARY:${eventTitle}
+DESCRIPTION:This week, practice the following scales: ${allShownScales.join(', ')}
+END:VEVENT
+END:VCALENDAR`;
+
+    // Trigger the download
+    const blob = new Blob([iCalContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'WeeklyScalesPractice.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});

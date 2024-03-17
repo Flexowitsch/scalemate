@@ -4,10 +4,14 @@
     /* fix for Chrome */
 
 
-     /* Color variables */
-     --white: #fff;
-     --grey-100: #242424;
-     --purple: #6941C6
+    /* Color variables */
+    --white: #fff;
+    --grey-100: #242424;
+    --grey-90: #4F4F4F;
+    --grey-80: #6F6F6F;
+    --grey-20: #F2F4F7;
+    --purple-100: #6941C6;
+    --purple-20: #F9F5FF;
 }
 
 @supports (font-variation-settings: normal) {
@@ -18,36 +22,49 @@
 }
 
 
-
 * {
     margin: 0;
 }
 
 body {
-    background: #F2F4F7;
+    background: var(--grey-20);
     position: relative;
+    padding: 1rem;
+    height: 100vh;
 }
 
 .flex {
     display: flex;
 }
 
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block
+}
 
 .content-wrapper {
-    /* position: absolute; */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
-    /*width: 22.5625rem;*/
+    width: 22.5625rem;
     padding: 4.5rem 1rem;
     flex-direction: column;
     align-items: center;
     gap: 2rem;
     border-radius: 0.5rem;
-    background: var(--White, #FFF);
+    background: var(--white);
     /* Shadow/md */
     box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06), 0px 4px 8px -2px rgba(16, 24, 40, 0.10);
 }
 
 /* General Layout */
+
+/* Header */
 
 .header-container {
     flex-direction: column;
@@ -58,4 +75,112 @@ body {
     width: 5.75rem;
     height: 5.75rem;
     flex-shrink: 0;
+}
+
+.header-container h1 {
+    color: var(--grey-100);
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 2rem;
+    /* 133.333% */
+}
+
+.header-container p {
+    color: #4F4F4F;
+    text-align: center;
+    font-family: Inter;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.5rem;
+    /* 150% */
+}
+
+/* suggestions */
+
+.title {
+    color: var(--grey-80);
+    text-align: center;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 2rem;
+    /* 200% */
+}
+
+#majorScalesContainer, #minorScalesContainer {
+    display: flex; 
+    flex-wrap: wrap;
+}
+
+
+
+.keysignature {
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.keysignature span {
+    color: #242424;
+    text-align: center;
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 2rem;
+    /* 160% */
+}
+
+
+
+/* interface */
+
+.interface-container {
+    gap: 1rem;
+}
+
+.interface-container .btn {
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 1.25rem;
+    box-shadow: none;
+    border: none;
+    padding: 0.5rem 0.88rem;
+    /* 142.857% */
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.interface-container .btn-primary {
+    background-color: var(--purple-100);
+    color: var(--white);
+}
+
+.interface-container .btn-primary:active {
+    background-color: #2f1d5b;
+    color: var(--white);
+}
+
+.interface-container .btn-secondary {
+    background-color: var(--purple-20);
+    color: var(--purple-100);
+}
+
+
+
+/* Initially hide the suggestions container and specific buttons */
+.suggestions-container, #calendarButton, #regenerateButton {
+    display: none;
+}
+
+
+
+#majorScalesContainer > div,
+#minorScalesContainer > div {
+    display: none;
+    justify-content: space-between;
+
 }
