@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const subline = document.getElementById("subline");
     const suggestButton = document.getElementById('suggestButton');
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const majorScales = Array.from(majorScalesContainer.children);
         const minorScales = Array.from(minorScalesContainer.children);
 
-
         majorScalesContainer.style.justifyContent = 'space-between';
         minorScalesContainer.style.justifyContent = 'space-between';
 
@@ -68,18 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
-// Calendar Button functionality
-
 calendarButton.addEventListener('click', () => {
-    const shownMajorScaleNames = Array.from(document.querySelectorAll('#majorScalesContainer .flex[style="display: flex;"] span')).map(element => element.textContent);
-    const shownMinorScaleNames = Array.from(document.querySelectorAll('#minorScalesContainer .flex[style="display: flex;"] span')).map(element => element.textContent);
+    const shownMajorScaleNames = Array.from(document.querySelectorAll('#majorScalesContainer .flex[style="display: flex;"] span')).map(element => element.textContent.trim().replace(/\s+/g, ' '));
+    const shownMinorScaleNames = Array.from(document.querySelectorAll('#minorScalesContainer .flex[style="display: flex;"] span')).map(element => element.textContent.trim().replace(/\s+/g, ' '));
     let allShownScales = shownMajorScaleNames.concat(shownMinorScaleNames);
 
     // Limit the number of scales in the title to keep it reasonable
-    const scalesForTitle = allShownScales.slice(0, 5);
+    const scalesForTitle = allShownScales.slice(0, 5).join(', ').trim(); // Join scale names with commas and trim leading/trailing spaces
     const moreScales = allShownScales.length > 5 ? ` +${allShownScales.length - 5} more` : '';
-    const eventTitle = `Practice Scales: ${scalesForTitle.join(', ')}${moreScales}`;
+    const eventTitle = `Practice Scales: ${scalesForTitle}${moreScales}`;
 
     // Find next Monday
     const nextMonday = new Date();
@@ -90,16 +85,16 @@ calendarButton.addEventListener('click', () => {
     nextSunday.setDate(nextSunday.getDate() + 6);
 
     const dateFormat = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    const formatAsICalDate = date => date.toISOString().slice(0, 10).replace(/-/g, '');
 
     // Create an iCal event for the whole next week
-    const iCalContent = 
-`BEGIN:VCALENDAR
+    const iCalContent = `BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
-DTSTART;VALUE=DATE:${nextMonday.toLocaleDateString('en-CA', dateFormat).replace(/-/g, '')}
-DTEND;VALUE=DATE:${nextSunday.toLocaleDateString('en-CA', dateFormat).replace(/-/g, '')}
+DTSTART;VALUE=DATE:${formatAsICalDate(nextMonday)}
+DTEND;VALUE=DATE:${formatAsICalDate(nextSunday)}
 SUMMARY:${eventTitle}
-DESCRIPTION:This week, practice the following scales: ${allShownScales.join(', ')}
+DESCRIPTION:This week, practice the following scales: ${allShownScales.join(', ').trim()} // Trim leading/trailing spaces between scale names
 END:VEVENT
 END:VCALENDAR`;
 
